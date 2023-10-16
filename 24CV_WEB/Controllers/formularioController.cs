@@ -1,4 +1,5 @@
 ﻿using _24CV_WEB.Models;
+using _24CV_WEB.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Mail;
@@ -7,6 +8,14 @@ namespace _24CV_WEB.Controllers
 {
     public class formularioController : Controller
     {
+
+        private readonly IEmailService _emailService;
+
+        public formularioController(IEmailService emailService)
+        {
+            _emailService = emailService;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -27,7 +36,15 @@ namespace _24CV_WEB.Controllers
             TempData["Email"] = model.Email;
             TempData["Comentario"] = model.Comentario;
 
-            SendEmail(model.Email, model.Comentario);
+            _emailService.SendEmailWithData(
+                new EmailData()
+                {
+                    Email = model.Email,
+                    Subject = "Notifiación de correo.",
+                    Content = model.Comentario
+
+                }
+                );
             
             return View("Index", model);
         }
